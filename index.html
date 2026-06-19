@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pAIr</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark:   #3D1F1F;
+      --bg-mid:    #4A2828;
+      --card:      #2E1616;
+      --accent:    #FF7A59;
+      --accent-lt: #FF8C6B;
+      --cream:     #F5E6D3;
+      --muted:     #B39B8A;
+      --border:    #5A3838;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-mid) 100%);
+      background-attachment: fixed;
+      color: var(--cream);
+      font-family: 'Inter', -apple-system, sans-serif;
+      min-height: 100vh;
+    }
+
+    h1, h2, h3 { font-family: 'Playfair Display', Georgia, serif; }
+
+    .wordmark {
+      font-family: 'Inter', sans-serif;
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      color: var(--cream);
+    }
+    .wordmark .ai { color: var(--accent); }
+
+    /* ── Grid background ── */
+    .grid-base, .grid-spot {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background-image:
+        linear-gradient(to right, rgba(255,122,89,0.06) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,122,89,0.06) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+    .grid-spot {
+      background-image:
+        linear-gradient(to right, rgba(255,122,89,0.22) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,122,89,0.22) 1px, transparent 1px);
+      -webkit-mask-image: radial-gradient(circle 280px at var(--mx, -999px) var(--my, -999px), black 0%, transparent 100%);
+      mask-image: radial-gradient(circle 280px at var(--mx, -999px) var(--my, -999px), black 0%, transparent 100%);
+    }
+
+    /* Ensure all content sits above grid */
+    nav, section, footer { position: relative; z-index: 1; }
+
+    section { padding: 6rem 1.5rem; }
+    section + section { border-top: 1px solid var(--border); }
+
+    .container { max-width: 880px; margin: 0 auto; }
+
+    /* Hero */
+    .hero-hl {
+      font-size: clamp(2.8rem, 7vw, 5rem);
+      line-height: 1.08;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    .hero-hl em { font-style: italic; color: var(--accent); }
+
+    .hero-sub {
+      font-size: clamp(0.95rem, 1.8vw, 1.1rem);
+      line-height: 1.8;
+      color: var(--muted);
+      max-width: 46ch;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-block;
+      padding: 0.75rem 2rem;
+      border-radius: 999px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      transition: transform 0.2s, box-shadow 0.2s, background 0.2s, color 0.2s;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 4px 24px rgba(255,122,89,0.36);
+    }
+    .btn-primary:hover {
+      transform: scale(1.04);
+      background: var(--accent-lt);
+      box-shadow: 0 6px 32px rgba(255,122,89,0.5);
+    }
+    .btn-outline {
+      background: transparent;
+      border: 1.5px solid var(--accent);
+      color: var(--accent);
+    }
+    .btn-outline:hover {
+      background: var(--accent);
+      color: #fff;
+      transform: scale(1.04);
+    }
+
+    /* Section labels */
+    .label {
+      font-size: 0.65rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1rem;
+      display: block;
+    }
+    .section-title {
+      font-size: clamp(1.9rem, 4vw, 2.8rem);
+      font-weight: 700;
+      line-height: 1.15;
+      margin-bottom: 1.25rem;
+    }
+    .section-title em { font-style: italic; color: var(--accent); }
+    .section-body {
+      font-size: 1rem;
+      line-height: 1.8;
+      color: var(--muted);
+      max-width: 54ch;
+    }
+
+    /* Problem cards */
+    .problem-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.25rem;
+      margin-top: 3rem;
+    }
+    .problem-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 1rem;
+      padding: 1.75rem;
+    }
+    .problem-card .num {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: var(--accent);
+      opacity: 0.5;
+      line-height: 1;
+      margin-bottom: 1rem;
+    }
+    .problem-card h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--cream);
+      margin-bottom: 0.6rem;
+      font-family: 'Inter', sans-serif;
+    }
+    .problem-card p {
+      font-size: 0.85rem;
+      line-height: 1.7;
+      color: var(--muted);
+    }
+
+    /* Vertical stepper */
+    .vstep-list {
+      position: relative;
+      margin-top: 3rem;
+    }
+    .vstep-list::before {
+      content: '';
+      position: absolute;
+      left: 19px;
+      top: 28px;
+      bottom: 28px;
+      width: 1px;
+      background: var(--border);
+      pointer-events: none;
+    }
+    .vstep {
+      display: flex;
+      gap: 1.75rem;
+      padding: 1.5rem 1.25rem;
+      border-radius: 1rem;
+      cursor: default;
+      transition: background 0.3s;
+      position: relative;
+    }
+    .vstep:hover { background: var(--card); }
+    .vstep-dot {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 1.5px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--muted);
+      flex-shrink: 0;
+      transition: border-color 0.3s, color 0.3s, box-shadow 0.3s, background 0.3s;
+      z-index: 1;
+      background: var(--bg-dark);
+    }
+    .vstep:hover .vstep-dot {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--card);
+      box-shadow: 0 0 18px rgba(255,122,89,0.4);
+    }
+    .vstep-body { padding-top: 0.5rem; }
+    .vstep-body strong {
+      display: block;
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--cream);
+      margin-bottom: 0.5rem;
+      transition: color 0.3s;
+    }
+    .vstep-body p {
+      font-size: 0.85rem;
+      line-height: 1.8;
+      color: var(--muted);
+      max-width: 54ch;
+      transition: color 0.3s;
+    }
+    .vstep:hover .vstep-body p { color: rgba(245,230,211,0.75); }
+
+    /* Fade-in on scroll */
+    .vstep {
+      opacity: 0;
+      transform: translateX(-12px);
+      transition: opacity 0.45s ease, transform 0.45s ease, background 0.3s;
+    }
+    .vstep.visible {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    /* Audience */
+    .audience-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+      margin-top: 2.5rem;
+    }
+    @media (max-width: 600px) { .audience-grid { grid-template-columns: 1fr; } }
+
+    .audience-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 1rem;
+      padding: 2rem;
+      transition: border-color 0.25s;
+    }
+    .audience-card:hover { border-color: rgba(255,122,89,0.4); }
+    .audience-card .tag {
+      display: inline-block;
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      border-radius: 999px;
+      padding: 0.2rem 0.75rem;
+      margin-bottom: 1.25rem;
+    }
+    .audience-card h3 {
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--cream);
+      margin-bottom: 0.75rem;
+    }
+    .audience-card ul {
+      list-style: none;
+    }
+    .audience-card ul li {
+      font-size: 0.84rem;
+      line-height: 1.7;
+      color: var(--muted);
+      padding: 0.4rem 0;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      gap: 0.6rem;
+    }
+    .audience-card ul li:last-child { border-bottom: none; }
+    .audience-card ul li .check { color: var(--accent); flex-shrink: 0; }
+
+    /* Validation */
+    .validation-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.25rem;
+      margin-top: 2.5rem;
+    }
+    .validation-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 1rem;
+      padding: 1.75rem;
+    }
+    .validation-card .source {
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.75rem;
+      display: block;
+    }
+    .validation-card blockquote {
+      font-size: 0.88rem;
+      line-height: 1.75;
+      color: var(--cream);
+      font-style: italic;
+      border-left: 2px solid var(--accent);
+      padding-left: 1rem;
+    }
+    .validation-card .attribution {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 0.75rem;
+    }
+
+    /* CTA */
+    .cta-wrap { text-align: center; }
+    .cta-wrap h2 {
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+    .cta-wrap h2 em { font-style: italic; color: var(--accent); }
+    .cta-wrap p {
+      font-size: 0.95rem;
+      color: var(--muted);
+      max-width: 46ch;
+      margin: 0 auto 2.5rem;
+      line-height: 1.8;
+    }
+    .cta-cols {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+      max-width: 660px;
+      margin: 0 auto;
+    }
+    @media (max-width: 520px) { .cta-cols { grid-template-columns: 1fr; } }
+
+    .cta-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 1rem;
+      padding: 2rem;
+      text-align: left;
+    }
+    .cta-card .tag {
+      display: inline-block;
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      border-radius: 999px;
+      padding: 0.2rem 0.75rem;
+      margin-bottom: 1rem;
+    }
+    .cta-card h3 {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--cream);
+      margin-bottom: 0.5rem;
+    }
+    .cta-card p {
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.7;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Footer */
+    footer {
+      padding: 2rem;
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+    }
+    footer a { color: var(--cream); text-decoration: none; transition: color 0.2s; }
+    footer a:hover { color: var(--accent); }
+
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: var(--card); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+    ::selection { background: var(--accent); color: #fff; }
+  </style>
+</head>
+<body>
+
+  <div class="grid-base"></div>
+  <div class="grid-spot" id="gridSpot"></div>
+
+
+  <!-- HERO -->
+  <section style="min-height: 100vh; display: flex; flex-direction: column; padding: 0;">
+    <nav style="padding: 1.5rem 2rem;">
+      <span class="wordmark">p<span class="ai">AI</span>r.</span>
+    </nav>
+
+    <div style="
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 0 1.5rem 5rem;
+    ">
+      <h1 class="hero-hl" style="margin-bottom: 1.5rem;">
+        AI safety hiring<br>runs on who you know.<br>
+        <em>We are changing that.</em>
+      </h1>
+
+      <p class="hero-sub" style="margin-bottom: 2.5rem;">
+        One AI conversation. A portable credential every AI safety org can trust.
+      </p>
+
+      <a href="#problem" class="btn btn-primary">Learn More</a>
+
+      <p style="margin-top: 4rem; font-size: 0.65rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--border);">
+        Scroll to explore
+      </p>
+    </div>
+  </section>
+
+
+  <!-- PROBLEM -->
+  <section id="problem">
+    <div class="container">
+      <span class="label">The problem</span>
+      <h2 class="section-title">Three things broke AI safety hiring.<br><em>None of them are being fixed.</em></h2>
+      <p class="section-body">
+        The field has job boards, fellowships, and Slack channels. What it does not have is
+        a trusted signal. Every mechanism that was supposed to surface talent has a different failure mode.
+      </p>
+
+      <div class="problem-grid">
+        <div class="problem-card">
+          <div class="num">01</div>
+          <h3>Referrals dominate</h3>
+          <p>The most reliable path into any AI safety role is a personal connection. Not qualifications, not portfolios. A recommendation from someone already inside. Talented people outside the network have no reliable pathway in, regardless of how relevant their skills are.</p>
+        </div>
+        <div class="problem-card">
+          <div class="num">02</div>
+          <h3>LLMs broke written applications</h3>
+          <p>AI has made applying nearly free. Application volume no longer signals genuine interest. Cover letters no longer surface whether someone can think clearly. Orgs are drowning in high-quality-sounding but meaningless submissions with no consistent alternative in sight.</p>
+        </div>
+        <div class="problem-card">
+          <div class="num">03</div>
+          <h3>Five orgs, five first-round screens</h3>
+          <p>Every AI safety org screens from scratch. The same candidate answers the same questions in five separate first-round calls. No portable signal. No shared rubric. No way for a candidate to build up a credential over time or understand what they are actually being evaluated on.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- FOUNDER VIDEO -->
+  <section>
+    <div class="container">
+      <span class="label">From the founder</span>
+      <h2 class="section-title" style="margin-bottom: 2rem;">The pitch, unfiltered.</h2>
+      <div style="
+        position: relative;
+        width: 100%;
+        aspect-ratio: 16 / 9;
+        border-radius: 1rem;
+        overflow: hidden;
+        border: 1px solid var(--border);
+        background: var(--card);
+      ">
+        <iframe
+          src="https://www.youtube.com/embed/YOUR_VIDEO_ID"
+          title="pAIr founder pitch"
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen
+          style="position: absolute; inset: 0; width: 100%; height: 100%;"
+        ></iframe>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- HOW IT WORKS -->
+  <section>
+    <div class="container">
+      <span class="label">What pAIr is</span>
+      <h2 class="section-title">One conversation.<br><em>A credential that travels.</em></h2>
+      <p class="section-body">
+        The AI agent replaces the first-round screen with something candidates take once and carry everywhere.
+        Orgs get a trusted score. Candidates get a portable profile.
+      </p>
+
+      <div class="vstep-list">
+        <div class="vstep">
+          <div class="vstep-dot">01</div>
+          <div class="vstep-body">
+            <strong>A real conversation, not a form</strong>
+            <p>A 30-45 minute AI agent interview that probes your background, reasoning about AI safety, and role-specific scenarios. Adaptive and hard to game — it follows up, challenges, and digs where a form cannot.</p>
+          </div>
+        </div>
+        <div class="vstep">
+          <div class="vstep-dot">02</div>
+          <div class="vstep-body">
+            <strong>Scored against a field-built rubric</strong>
+            <p>The rubric is built with input from senior people at MATS, ARC, Apollo, METR, and similar orgs. Not invented by a startup. That provenance is what makes the score trustworthy enough for orgs to act on.</p>
+          </div>
+        </div>
+        <div class="vstep">
+          <div class="vstep-dot">03</div>
+          <div class="vstep-body">
+            <strong>A portable credential that travels with you</strong>
+            <p>Score, rubric breakdown, and transcript summary — shareable with any org you apply to. Orgs get a trusted signal without scheduling a call. "pAIr score preferred" starts appearing in job descriptions.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- WHO IT'S FOR -->
+  <section>
+    <div class="container">
+      <span class="label">Who it is for</span>
+      <h2 class="section-title">Two sides of the same broken market.</h2>
+      <p class="section-body">
+        The signal problem hurts candidates and orgs differently. pAIr fixes both sides at once.
+      </p>
+
+      <div class="audience-grid">
+        <div class="audience-card">
+          <span class="tag">Candidates</span>
+          <h3>People trying to enter AI safety</h3>
+          <ul>
+            <li><span class="check">&#x2713;</span> No personal network in the field</li>
+            <li><span class="check">&#x2713;</span> Filling out near-identical forms for five orgs</li>
+            <li><span class="check">&#x2713;</span> Getting rejected with no understanding of why</li>
+            <li><span class="check">&#x2713;</span> Especially hard for generalists: ops, research management, field-building, policy</li>
+            <li><span class="check">&#x2713;</span> pAIr gives them a credential that speaks for them before any org picks up the phone</li>
+          </ul>
+        </div>
+        <div class="audience-card">
+          <span class="tag">Organisations</span>
+          <h3>AI safety orgs trying to hire</h3>
+          <ul>
+            <li><span class="check">&#x2713;</span> Senior staff are too scarce to run first-round screens</li>
+            <li><span class="check">&#x2713;</span> LLM-written applications have collapsed the signal in CVs and cover letters</li>
+            <li><span class="check">&#x2713;</span> Rebuilding screening rubrics from scratch every hiring round</li>
+            <li><span class="check">&#x2713;</span> Trusting only candidates who came via referral</li>
+            <li><span class="check">&#x2713;</span> pAIr replaces the first-round call with a trusted score they can act on immediately</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- VALIDATION -->
+  <section>
+    <div class="container">
+      <span class="label">Validation</span>
+      <h2 class="section-title">The field has said this clearly.<br><em>Multiple times, independently.</em></h2>
+      <p class="section-body">
+        This is not a hypothesis. The pain is documented, public, and has been flagged from both sides of the market within the last six months.
+      </p>
+
+      <div class="validation-grid">
+        <div class="validation-card">
+          <span class="source">MATS Research, Q4 2025</span>
+          <blockquote>Organizations are capacity-constrained on senior mentors, forcing hyper-selective hiring where direct collaboration with a trusted reference is the dominant signal.</blockquote>
+          <p class="attribution">23 interviews with hiring managers, research leads, and funders</p>
+        </div>
+        <div class="validation-card">
+          <span class="source">Constellation / Kairos, April 2026</span>
+          <blockquote>Generalist talent is the binding constraint. Harder to source than research talent and the tighter bottleneck for converting funding into impact.</blockquote>
+          <p class="attribution">Launch announcement for the Generator Residency, 15-30 people</p>
+        </div>
+        <div class="validation-card">
+          <span class="source">Coefficient Giving, May 2026</span>
+          <blockquote>Staff capacity constraints prevent us from re-investigating every grantee's funding needs regularly. We extended our own hiring deadline due to insufficient applications.</blockquote>
+          <p class="attribution">The largest AI safety funder, with $1B to deploy in 2026</p>
+        </div>
+        <div class="validation-card">
+          <span class="source">EA Forum, April-June 2026</span>
+          <blockquote>At least three independent posts in a six-week window flagged the same problem: difficulty hiring field-builders and ops staff, referral dependency, and no legible alternative path for generalists.</blockquote>
+          <p class="attribution">Including "Plugging the generalist gap in AI safety with freelancers," posted last week</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- CTA -->
+  <section>
+    <div class="container cta-wrap">
+      <h2>
+        Get in early.<br>
+        <em>On either side.</em>
+      </h2>
+      <p>
+        We are building the scoring rubric now with senior researchers across the field.
+        Beta access opens to candidates and orgs this summer.
+      </p>
+
+      <div class="cta-cols">
+        <div class="cta-card">
+          <span class="tag">Candidates</span>
+          <h3>Get your pAIr score</h3>
+          <p>Be among the first to complete the AI agent interview and get a portable credential before the field standardises on it.</p>
+          <a href="mailto:mailsinghanshuman@gmail.com?subject=pAIr - Candidate beta" class="btn btn-primary" style="width: 100%; text-align: center;">Join the beta</a>
+        </div>
+        <div class="cta-card">
+          <span class="tag">Organisations</span>
+          <h3>Partner with pAIr</h3>
+          <p>Skip first-round screens. Get a trusted scored report on every applicant. Help shape the rubric that will define field-wide hiring standards.</p>
+          <a href="mailto:mailsinghanshuman@gmail.com?subject=pAIr - Org partner" class="btn btn-outline" style="width: 100%; text-align: center;">Book a call</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- FOOTER -->
+  <footer>
+    Built by <a href="https://www.linkedin.com/in/anshuman-singh-4537731a5/" target="_blank" rel="noopener">Anshuman</a> on a laptop 🛠️
+  </footer>
+
+
+  <script>
+    // Mouse spotlight
+    document.addEventListener('mousemove', (e) => {
+      document.documentElement.style.setProperty('--mx', e.clientX + 'px');
+      document.documentElement.style.setProperty('--my', e.clientY + 'px');
+    });
+
+    // Stepper fade-in on scroll
+    const steps = document.querySelectorAll('.vstep');
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach((entry, i) => {
+        if (entry.isIntersecting) {
+          const idx = Array.from(steps).indexOf(entry.target);
+          setTimeout(() => entry.target.classList.add('visible'), idx * 120);
+          obs.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15 });
+    steps.forEach(s => obs.observe(s));
+  </script>
+
+</body>
+</html>
