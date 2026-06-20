@@ -7,7 +7,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,700;1,700&family=Cormorant+Garamond:ital,wght@1,400;1,600&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg-dark:   #3D1F1F;
@@ -427,18 +427,18 @@
       white-space: nowrap;
       will-change: transform;
     }
-    .marquee-track.left  { animation: marquee-left  45s linear infinite; }
-    .marquee-track.right { animation: marquee-right 45s linear infinite; }
+    .marquee-track.left  { animation: marquee-left  25s linear infinite; }
+    .marquee-track.right { animation: marquee-right 25s linear infinite; }
     .marquee-item {
       display: inline-flex;
       align-items: center;
       gap: 1.5rem;
       padding: 0 1.5rem;
-      font-size: 0.7rem;
-      letter-spacing: 0.13em;
-      text-transform: uppercase;
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-style: italic;
+      font-size: 1.1rem;
+      font-weight: 600;
       color: var(--muted);
-      font-weight: 500;
     }
     .marquee-item .accent { color: var(--accent); }
     .marquee-sep {
